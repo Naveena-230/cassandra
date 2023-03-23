@@ -1,5 +1,6 @@
 # cassandra
 A Column family database is similar to a table in Relational Database Management System that stores data in rows and columns.
+
 STEPS INVOLVLED IN CREATING COLUMN FAMILY DATABASE USING CASSANDRA
 
           1)Create a  keyspace in cassandra.
