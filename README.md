@@ -8,7 +8,7 @@ STEPS INVOLVLED IN CREATING COLUMN FAMILY DATABASE USING CASSANDRA
           3)Insert the data into the column families.
    
    
-shop management system
+shop management system:
 Creation of a KEYSPACE called shop_management.
 The database includes three tables
 
