@@ -1,0 +1,135 @@
+cqlsh> CREATE KEYSPACE shop_management WITH replication={'class':'SimpleStrategy','replication_factor':1};
+cqlsh> USE shop_management;
+cqlsh:shop_management> CREATE TABLE products(product_id varchar PRIMARY KEY,product_name text,product_price decimal,product_quantity int);
+cqlsh:shop_management> describe products;
+
+CREATE TABLE shop_management.products (
+    product_id text PRIMARY KEY,
+    product_name text,
+    product_price decimal,
+    product_quantity int
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:shop_management> CREATE TABLE customer(customer_id varchar PRIMARY KEY,customer_name text,customer_email text);
+cqlsh:shop_management> describe customer;
+
+CREATE TABLE shop_management.customer (
+    customer_id text PRIMARY KEY,
+    customer_email text,
+    customer_name text
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:shop_management> CREATE TABLE orders(order_id varchar PRIMARY KEY,order_date timestamp,customer_id varchar,quantity int,product_id varchar,price decimal,total decimal);
+cqlsh:shop_management> describe orders;
+
+CREATE TABLE shop_management.orders (
+    order_id text PRIMARY KEY,
+    customer_id text,
+    order_date timestamp,
+    price decimal,
+    product_id text,
+    quantity int,
+    total decimal
+) WITH bloom_filter_fp_chance = 0.01
+    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+    AND comment = ''
+    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+    AND crc_check_chance = 1.0
+    AND dclocal_read_repair_chance = 0.1
+    AND default_time_to_live = 0
+    AND gc_grace_seconds = 864000
+    AND max_index_interval = 2048
+    AND memtable_flush_period_in_ms = 0
+    AND min_index_interval = 128
+    AND read_repair_chance = 0.0
+    AND speculative_retry = '99PERCENTILE';
+
+cqlsh:shop_management> INSERT INTO products(product_id, product_name, product_price, product_quantity)VALUES ('1001','Product A', 20.00, 100);
+cqlsh:shop_management> INSERT INTO products(product_id, product_name, product_price, product_quantity)VALUES ('1002','Product B', 60.00, 50);
+cqlsh:shop_management> INSERT INTO products(product_id, product_name, product_price, product_quantity)VALUES ('1003','Product c', 10.00, 5);
+cqlsh:shop_management> INSERT INTO products(product_id, product_name, product_price, product_quantity)VALUES ('1004','Product D', 80.00, 9);
+cqlsh:shop_management> SELECT*FROM products;
+
+ product_id | product_name | product_price | product_quantity
+------------+--------------+---------------+------------------
+       1002 |    Product B |         60.00 |               50
+       1004 |    Product D |         80.00 |                9
+       1003 |    Product c |         10.00 |                5
+       1001 |    Product A |         20.00 |              100
+
+(4 rows)
+cqlsh:shop_management> INSERT INTO customer (customer_id, customer_name, customer_email)VALUES (1, 'John Doe', 'johndoe@gmail.com');
+InvalidRequest: Error from server: code=2200 [Invalid query] message="Invalid INTEGER constant (1) for "customer_id" of type text"
+cqlsh:shop_management> INSERT INTO customer (customer_id, customer_name, customer_email)VALUES ('1', 'John Doe', 'johndoe@gmail.com');
+cqlsh:shop_management> INSERT INTO customer (customer_id, customer_name, customer_email)VALUES ('2', 'ayra', 'ayra@gmail.com');
+cqlsh:shop_management> INSERT INTO customer (customer_id, customer_name, customer_email)VALUES ('3', 'charles', 'charles@gmail.com');
+cqlsh:shop_management> SELECT*FROM customer;
+
+ customer_id | customer_email    | customer_name
+-------------+-------------------+---------------
+           3 | charles@gmail.com |       charles
+           2 |    ayra@gmail.com |          ayra
+           1 | johndoe@gmail.com |      John Doe
+
+(3 rows)
+
+cqlsh:shop_management> INSERT INTO orders (order_id, order_date, customer_id, product_id, quantity, price, total)VALUES ('560', toTimestamp(now()), '3','1003',2,20.00, 40.00);
+cqlsh:shop_management> INSERT INTO orders (order_id, order_date, customer_id, product_id, quantity, price, total)VALUES ('203', toTimestamp(now()), '2','1004',5,13.00, 30.00);
+cqlsh:shop_management> INSERT INTO orders (order_id, order_date, customer_id, product_id, quantity, price, total)VALUES ('109', toTimestamp(now()), '1','1002',7,6.00, 90.00);
+cqlsh:shop_management> SELECT*FROM orders;
+
+ order_id | customer_id | order_date                      | price | product_id | quantity | total
+----------+-------------+---------------------------------+-------+------------+----------+-------
+      560 |           3 | 2023-03-19 17:50:32.189000+0000 | 20.00 |       1003 |        2 | 40.00
+      109 |           1 | 2023-03-19 17:52:22.718000+0000 |  6.00 |       1002 |        7 | 90.00
+      203 |           2 | 2023-03-19 17:51:37.499000+0000 | 13.00 |       1004 |        5 | 30.00
+
+(3 rows)
+
+cqlsh:shop_management> UPDATE products SET product_name = 'Product Z' WHERE product_id ='1004';
+cqlsh:shop_management> SELECT*FROM products;
+
+ product_id | product_name | product_price | product_quantity
+------------+--------------+---------------+------------------
+       1002 |    Product B |         60.00 |               50
+       1004 |    Product Z |         80.00 |                9
+       1003 |    Product c |         10.00 |                5
+       1001 |    Product A |         20.00 |               50
+
+(4 rows)
+cqlsh:shop_management> DELETE FROM customer WHERE customer_id='2';
+cqlsh:shop_management> SELECT*FROM customer;
+
+ customer_id | customer_email    | customer_name
+-------------+-------------------+---------------
+           3 | charles@gmail.com |       charles
+           1 | johndoe@gmail.com |      John Doe
+
+(2 rows)
