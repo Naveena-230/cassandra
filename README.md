@@ -27,7 +27,7 @@ The products table stores information about products such as
          price
    
    
-The orders table stores infofrmation about orders such as
+The orders table stores information about orders such as
 
 
          order_id
